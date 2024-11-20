@@ -6,9 +6,10 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/prathviputhran/SWA.git'
+                    git branch: 'main', url: 'https://github.com/prathviputhran/SWA.git'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
