@@ -41,7 +41,7 @@ pipeline {
                         echo "Deploying to Kubernetes..."
                         // Here, you can replace this with your actual deployment command
                         // Example: Apply Kubernetes deployment from a YAML file
-                        sh "kubectl apply -f k8s/deployment.yaml"
+                        sh "kubectl apply -f deployment.yaml"
                         // Check the status of the pods after deploying
                         sh "kubectl get pods"
                     }
