@@ -1,8 +1,9 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = "prathvipp/mywebsite2"
-        K8S_CREDENTIAL = 'my-k8s-cluster'
+        DOCKER_IMAGE = "prathvipp/mywebsite4"
+        AWS_REGION = 'us-east-1'  // Example region
+        EKS_CLUSTER_NAME = 'my-k8s-cluster'  // Replace with your EKS cluster name
     }
     stages {
         stage('Clone Repository') {
@@ -34,22 +35,23 @@ pipeline {
             }
         }
         
-        stage('Kubernetes Authentication Test') {
+        stage('Authenticate with AWS and Update Kubeconfig') {
             steps {
                 script {
-                    sh 'kubectl cluster-info'  // Check if kubectl can connect to the cluster
+                    // Authenticate with AWS and set up kubeconfig for kubectl (assuming AWS credentials are set up)
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                        sh "aws eks --region ${AWS_REGION} update-kubeconfig --name ${EKS_CLUSTER_NAME}"
+                    }
                 }
             }
         }
-        
-        stage('Deploy to Kubernetes') {
+
+        stage('Deploy to EKS') {
             steps {
                 script {
-                    withKubeConfig([credentialsId: env.K8S_CREDENTIAL]) {
-                        echo "Deploying to Kubernetes..."
-                        sh "kubectl apply -f deployment.yaml"  // Direct path to the root level file
-                        sh "kubectl get pods"
-                    }
+                    // Deploy Docker image to EKS cluster using kubectl
+                    sh "kubectl apply -f deployment.yaml"  // Assuming deployment.yaml is configured
+                    sh "kubectl get pods"
                 }
             }
         }
